@@ -1,0 +1,14 @@
+{
+  "name": "touchwood-depth-tool",
+  "private": true,
+  "type": "module",
+  "description": "Offline tool: generates depth maps for real photos (MiDaS v2.1 small, ONNX). Not part of the website build.",
+  "scripts": {
+    "model": "node download-model.mjs",
+    "depth": "node make-depth.mjs"
+  },
+  "dependencies": {
+    "onnxruntime-node": "^1.22.0",
+    "sharp": "^0.35.5"
+  }
+}
