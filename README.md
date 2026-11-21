@@ -1,6 +1,3 @@
-run live  - https://3d-villa-three.vercel.app/virtual-tour
-
-
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -125,3 +122,27 @@ const q = useQuality();                       // low | medium | high (force with
 </Canvas>
 <DevPanel />
 ```
+
+---
+
+## Real photos in 3D (depth effect)
+
+Every "Explore Inside", "Real exterior in 3D", "View real photos in 3D" and "Real photos" view uses **actual photographs from touchwoodbliss.com**. Each photo gets an AI depth map, which makes it move in 3D with the cursor, drag or phone tilt.
+
+- Web photos and depth maps: `public/real/<id>.webp` and `public/real/<id>-depth.webp`
+- Which photo belongs to which villa or area: `components/virtual-tour/data.ts` (`outsidePhotos`, `insidePhotos`)
+- Farmsyde Villa has no exterior photo on the website yet, so it only has the inside tour.
+
+### Adding new photos
+1. Put the original photo in `assets/real-photos/` (create the folder).
+2. Add a line to `tools/depth/photos.json`, e.g. `"farmsyde-exterior": "my-photo.jpg"`.
+3. Generate the web photo and depth map:
+```bash
+cd tools/depth
+npm install
+npm run model
+npm run depth -- farmsyde-exterior
+```
+4. Add `real("farmsyde-exterior", "Villa exterior")` to the villa in `data.ts`.
+
+The depth tool (MiDaS v2.1 small, ONNX) is separate from the website. It doesn't affect `npm install` or the Vercel build.

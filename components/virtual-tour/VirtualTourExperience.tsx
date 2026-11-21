@@ -8,12 +8,12 @@ import ResortNavigation from "./ResortNavigation";
 import LocationInformation from "./LocationInformation";
 import VillaExplorer from "./VillaExplorer";
 import EnquiryPanel from "./EnquiryPanel";
-import { LOCATIONS, getLocation } from "./data";
+import { LOCATIONS, RESORT_PHOTOS, getLocation } from "./data";
 import { useTour } from "./store";
 
 // 3D bundles are lazy-loaded on the client only
 const ResortScene = dynamic(() => import("./ResortScene"), { ssr: false });
-const InteriorTour = dynamic(() => import("./InteriorTour"), { ssr: false });
+const PhotoTour = dynamic(() => import("./PhotoTour"), { ssr: false });
 
 function hasWebGL() {
   try {
@@ -51,7 +51,7 @@ function Fallback() {
 export default function VirtualTourExperience() {
   const [ready, setReady] = useState(false);
   const [webgl, setWebgl] = useState<boolean | null>(null);
-  const { mode, selected, setReducedMotion, backToAerial } = useTour();
+  const { mode, selected, setReducedMotion, backToAerial, photoTour, closePhotos, exitInterior } = useTour();
 
   useEffect(() => {
     setWebgl(hasWebGL());
@@ -67,6 +67,7 @@ export default function VirtualTourExperience() {
       if (e.key !== "Escape") return;
       const s = useTour.getState();
       if (s.enquiryOpen) s.closeEnquiry();
+      else if (s.photoTour) s.closePhotos();
       else if (s.mode === "interior") s.exitInterior();
       else if (s.mode === "villa" && s.selected) s.select(s.selected);
       else if (s.mode === "location") backToAerial();
@@ -85,7 +86,24 @@ export default function VirtualTourExperience() {
       <ResortNavigation />
       <LocationInformation />
       <VillaExplorer />
-      {mode === "interior" && loc && <InteriorTour location={loc} />}
+      {mode === "interior" && loc?.insidePhotos?.length ? (
+        <PhotoTour eyebrow="Inside · real photographs" title={loc.name} photos={loc.insidePhotos} backLabel="Exterior" onBack={exitInterior} enquireId={loc.id} />
+      ) : null}
+      {photoTour && (() => {
+        const p = photoTour.id === "resort" ? null : getLocation(photoTour.id);
+        const photos = p ? (photoTour.set === "inside" ? p.insidePhotos ?? [] : p.outsidePhotos) : RESORT_PHOTOS;
+        return (
+          <PhotoTour
+            key={`${photoTour.id}-${photoTour.set}`}
+            eyebrow={p ? (photoTour.set === "inside" ? "Inside · real photographs" : "Real photographs in 3D") : "Touchwood Bliss · real photographs"}
+            title={p ? p.name : "The Resort"}
+            photos={photos}
+            backLabel="Back"
+            onBack={closePhotos}
+            enquireId={p?.id ?? null}
+          />
+        );
+      })()}
       <EnquiryPanel />
       <LoadingScreen ready={ready} />
     </main>

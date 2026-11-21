@@ -14,7 +14,7 @@ interface Props {
 
 export default function LocationHotspot({ position, label, active, small, onClick, onHover }: Props) {
   return (
-    <Html position={position} center zIndexRange={[30, 0]} style={{ pointerEvents: "none" }}>
+    <Html position={position} center zIndexRange={[19, 0]} style={{ pointerEvents: "none" }}>
       <button
         type="button"
         onClick={(e) => {

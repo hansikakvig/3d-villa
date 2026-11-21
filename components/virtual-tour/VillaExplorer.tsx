@@ -5,7 +5,7 @@ import { useTour } from "./store";
 
 /** Exterior exploration HUD for a single villa: viewpoints + Explore Inside. */
 export default function VillaExplorer() {
-  const { mode, selected, viewpoint, setViewpoint, enterInterior, openEnquiry, select } = useTour();
+  const { mode, selected, viewpoint, setViewpoint, enterInterior, openEnquiry, select, openPhotos } = useTour();
   const loc = getLocation(selected);
   if ((mode !== "villa" && mode !== "entering") || !loc?.viewpoints) return null;
 
@@ -26,13 +26,23 @@ export default function VillaExplorer() {
             </button>
           ))}
         </div>
-        <div className="mt-4 flex gap-2">
-          <button onClick={enterInterior} disabled={mode === "entering"} className="tb-btn-primary flex-1">
-            {mode === "entering" ? "Entering…" : "Explore Inside"}
+        {loc.outsidePhotos.length > 0 ? (
+          <button onClick={() => openPhotos(loc.id, "outside")} className="tb-btn-ghost mt-4 w-full">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 15l5-5 5 5 3-3 5 5" /></svg>
+            Real exterior in 3D
           </button>
+        ) : (
+          <p className="mt-4 text-[11px] text-white/55">Real exterior photos of this villa are not on the website yet.</p>
+        )}
+        <div className="mt-2 flex gap-2">
+          {loc.insidePhotos?.length ? (
+            <button onClick={enterInterior} disabled={mode === "entering"} className="tb-btn-primary flex-1">
+              {mode === "entering" ? "Entering…" : "Explore Inside"}
+            </button>
+          ) : null}
           <button onClick={() => openEnquiry(loc.id)} className="tb-btn-ghost">Enquire</button>
         </div>
-        <p className="mt-3 text-[10px] leading-snug text-white/50">3D villa massing is an approximate placeholder. See photographs for the actual architecture.</p>
+        <p className="mt-3 text-[10px] leading-snug text-white/50">The 3D model is an approximate placeholder. The real exterior and Explore Inside views use actual photographs.</p>
       </div>
       {mode === "entering" && <div className="tb-enter-fade pointer-events-none fixed inset-0 z-[35] bg-[#0f1813]" />}
     </>

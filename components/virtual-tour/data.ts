@@ -1,4 +1,4 @@
-// Content sourced from touchwoodbliss.com (/, /stay, /dining, /contact).
+// Content and photographs sourced from touchwoodbliss.com (/, /stay, /dining, /contact, /venues, /gallery).
 // Positions in the 3D scene are ILLUSTRATIVE ONLY. No surveyed masterplan or
 // architectural drawings were available, so placement is approximate.
 
@@ -11,15 +11,14 @@ export interface Viewpoint {
   marker?: Vec3; // where the in-scene hotspot sits (defaults to target)
 }
 
-export interface Room {
-  id: string;
-  name: string;
-  kind: "indoor" | "outdoor";
-  /** equirectangular 360° photo. Leave undefined to show the labelled placeholder. */
-  pano?: string;
-  palette: { wall: string; floor: string; ceiling: string; accent: string };
-  links: { to: string; yaw: number; pitch?: number }[];
+/** A real photograph from touchwoodbliss.com plus its generated depth map. */
+export interface RealPhoto {
+  title: string;
+  src: string;
+  depth: string;
 }
+
+const real = (id: string, title: string): RealPhoto => ({ title, src: `/real/${id}.webp`, depth: `/real/${id}-depth.webp` });
 
 export interface Location {
   id: string;
@@ -33,7 +32,10 @@ export interface Location {
   camera: { pos: Vec3; target: Vec3 }; // absolute
   viewpoints?: Viewpoint[]; // villas only, first = overview
   entry?: Viewpoint; // villas: camera path into the door
-  rooms?: Room[];
+  /** real exterior / outdoor photos (villas) or area photos (amenities) */
+  outsidePhotos: RealPhoto[];
+  /** real interior photos (villas) */
+  insidePhotos?: RealPhoto[];
   moreUrl: string;
 }
 
@@ -51,11 +53,6 @@ export const CONTACT = {
   address: "Bhavali Dam Road, Bhagatwadi, Igatpuri, Nashik, Maharashtra 422403",
 };
 
-const warm = { wall: "#e9dcc6", floor: "#8a6342", ceiling: "#f4ede1", accent: "#5b7a52" };
-const kerala = { wall: "#efe3cf", floor: "#6b3f26", ceiling: "#7a4a2b", accent: "#a5482c" };
-const farm = { wall: "#f1ece2", floor: "#a07a55", ceiling: "#faf7f0", accent: "#4f6b47" };
-const out = { wall: "#bcd3b0", floor: "#5f7f4a", ceiling: "#cfe3ee", accent: "#3a6b47" };
-
 export const LOCATIONS: Location[] = [
   {
     id: "amora",
@@ -70,7 +67,19 @@ export const LOCATIONS: Location[] = [
       "Interiors designed with natural elements",
       "Perfect for couples and intimate family stays",
     ],
-    images: ["/tb/amora/amora5.webp", "/tb/amora/amora4.webp", "/tb/amora/amora2.webp"],
+    images: ["/real/amora-exterior-pool.webp", "/real/amora-living.webp", "/real/amora-bedroom-1.webp", "/real/amora-pool-sunset.webp"],
+    outsidePhotos: [
+      real("amora-exterior-pool", "Villa and pool"),
+      real("amora-exterior-dusk", "Villa at dusk"),
+      real("amora-pool-sunset", "Pool at sunset"),
+      real("amora-outdoor", "Outdoor space"),
+    ],
+    insidePhotos: [
+      real("amora-living", "Living room"),
+      real("amora-bedroom-1", "Bedroom · view 1"),
+      real("amora-bedroom-2", "Bedroom · view 2"),
+      real("amora-bedroom-3", "Bedroom · view 3"),
+    ],
     position: [-30, 0, -8],
     camera: { pos: [-12, 16, 14], target: [-30, 1, -6] },
     viewpoints: [
@@ -80,13 +89,6 @@ export const LOCATIONS: Location[] = [
       { label: "Garden", pos: [-17, 3, 9], target: [-8, 0.5, 2] },
     ],
     entry: { label: "Entry", pos: [3, 1.7, 5], target: [3, 1.7, 0] },
-    rooms: [
-      { id: "living", name: "Living Room", kind: "indoor", palette: warm, links: [{ to: "bedroom", yaw: 70 }, { to: "pool", yaw: 180 }, { to: "garden", yaw: -90 }] },
-      { id: "bedroom", name: "Bedroom", kind: "indoor", palette: warm, links: [{ to: "living", yaw: -110 }, { to: "bathroom", yaw: 40 }] },
-      { id: "bathroom", name: "Bathroom", kind: "indoor", palette: { ...warm, wall: "#dcd6cb" }, links: [{ to: "bedroom", yaw: 180 }] },
-      { id: "garden", name: "Private Garden", kind: "outdoor", palette: out, links: [{ to: "living", yaw: 90 }, { to: "pool", yaw: 150 }] },
-      { id: "pool", name: "Private Pool", kind: "outdoor", palette: { ...out, floor: "#4fa8b5" }, links: [{ to: "living", yaw: 0 }, { to: "garden", yaw: -60 }] },
-    ],
     moreUrl: "https://touchwoodbliss.com/stay",
   },
   {
@@ -102,7 +104,13 @@ export const LOCATIONS: Location[] = [
       "Spacious, comfortable stay",
       "Ideal for families and group getaways",
     ],
-    images: ["/tb/farmsyde/farmsyde1.webp", "/tb/farmsyde/farmsyde2.webp", "/tb/farmsyde/farmsyde3.webp"],
+    images: ["/real/farmsyde-bedroom-1.webp", "/real/farmsyde-bedroom-2.webp", "/real/farmsyde-bathroom.webp"],
+    outsidePhotos: [],
+    insidePhotos: [
+      real("farmsyde-bedroom-1", "Bedroom · view 1"),
+      real("farmsyde-bedroom-2", "Bedroom · view 2"),
+      real("farmsyde-bathroom", "Bathroom"),
+    ],
     position: [28, 0, -12],
     camera: { pos: [44, 16, 12], target: [26, 1, -8] },
     viewpoints: [
@@ -112,13 +120,6 @@ export const LOCATIONS: Location[] = [
       { label: "Open lawns", pos: [-24, 3.5, 12], target: [-12, 0.5, 0] },
     ],
     entry: { label: "Entry", pos: [0, 1.7, 6], target: [0, 1.7, 0] },
-    rooms: [
-      { id: "living", name: "Family Living Room", kind: "indoor", palette: farm, links: [{ to: "bedroom", yaw: 90 }, { to: "verandah", yaw: 180 }] },
-      { id: "bedroom", name: "Bedroom", kind: "indoor", palette: farm, links: [{ to: "living", yaw: -90 }, { to: "bathroom", yaw: 30 }] },
-      { id: "bathroom", name: "Bathroom", kind: "indoor", palette: { ...farm, wall: "#e2ddd3" }, links: [{ to: "bedroom", yaw: 180 }] },
-      { id: "verandah", name: "Verandah & Pool", kind: "outdoor", palette: { ...out, floor: "#4fa8b5" }, links: [{ to: "living", yaw: 0 }, { to: "lawn", yaw: -90 }] },
-      { id: "lawn", name: "Open Lawn", kind: "outdoor", palette: out, links: [{ to: "verandah", yaw: 90 }] },
-    ],
     moreUrl: "https://touchwoodbliss.com/stay",
   },
   {
@@ -134,7 +135,15 @@ export const LOCATIONS: Location[] = [
       "Perfect for relaxation and leisure",
       "Ideal for shared moments",
     ],
-    images: ["/tb/courtyard/courtyard1.webp", "/tb/courtyard/courtyard2.webp", "/tb/courtyard/courtyard4.webp", "/tb/courtyard/courtyard3.webp"],
+    images: ["/real/courtyard-exterior-night.webp", "/real/courtyard-courtyard.webp", "/real/courtyard-bedroom.webp", "/real/courtyard-sitout.webp"],
+    outsidePhotos: [
+      real("courtyard-exterior-night", "Villa at night"),
+      real("courtyard-courtyard", "Central courtyard"),
+    ],
+    insidePhotos: [
+      real("courtyard-bedroom", "Bedroom with mountain view"),
+      real("courtyard-sitout", "Sit-out and room"),
+    ],
     position: [6, 0, -38],
     camera: { pos: [26, 18, -16], target: [6, 1, -38] },
     viewpoints: [
@@ -144,13 +153,6 @@ export const LOCATIONS: Location[] = [
       { label: "Entrance", pos: [0, 3, 19], target: [0, 2, 0] },
     ],
     entry: { label: "Entry", pos: [0, 1.7, 9], target: [0, 1.7, 0] },
-    rooms: [
-      { id: "courtyard", name: "Central Courtyard", kind: "outdoor", palette: { ...kerala, ceiling: "#cfe3ee", floor: "#8d7b66" }, links: [{ to: "living", yaw: 0 }, { to: "bedroom", yaw: 90 }, { to: "pool", yaw: 180 }] },
-      { id: "living", name: "Living Room", kind: "indoor", palette: kerala, links: [{ to: "courtyard", yaw: 180 }] },
-      { id: "bedroom", name: "Bedroom", kind: "indoor", palette: kerala, links: [{ to: "courtyard", yaw: -90 }, { to: "bathroom", yaw: 60 }] },
-      { id: "bathroom", name: "Bathroom", kind: "indoor", palette: { ...kerala, ceiling: "#efe3cf" }, links: [{ to: "bedroom", yaw: 180 }] },
-      { id: "pool", name: "Infinity Pool Deck", kind: "outdoor", palette: { ...out, floor: "#4fa8b5" }, links: [{ to: "courtyard", yaw: 0 }] },
-    ],
     moreUrl: "https://touchwoodbliss.com/stay",
   },
   {
@@ -160,7 +162,8 @@ export const LOCATIONS: Location[] = [
     tagline: "Swimming pool with nature views",
     description: "The resort swimming pool, set among the greenery and mountain views of Igatpuri.",
     highlights: ["Nature views", "Open to resort guests"],
-    images: ["/tb/areas/pool.webp"],
+    images: ["/real/pool-2.webp", "/real/pool-1.webp", "/real/pool-3.webp"],
+    outsidePhotos: [real("pool-2", "Swimming pool"), real("pool-1", "Pool and mountains"), real("pool-3", "Pool at sunset")],
     position: [2, 0, 8],
     camera: { pos: [16, 11, 26], target: [2, 0, 8] },
     moreUrl: "https://touchwoodbliss.com/stay",
@@ -173,7 +176,8 @@ export const LOCATIONS: Location[] = [
     description:
       "The resort's cafe and nature lounge. Touchwood Bliss is a fully pure veg resort, with Jain meals on request.",
     highlights: ["Pure veg & Jain dining", "Nature lounge"],
-    images: ["/tb/areas/rootscafe.webp", "/tb/areas/dining.webp"],
+    images: ["/real/roots-1.webp"],
+    outsidePhotos: [real("roots-1", "Roots Cafe")],
     position: [-16, 0, 22],
     camera: { pos: [-4, 9, 38], target: [-16, 1, 22] },
     moreUrl: "https://touchwoodbliss.com/dining",
@@ -185,7 +189,8 @@ export const LOCATIONS: Location[] = [
     tagline: "Seven lawns and indoor venues for up to 800 guests",
     description: "Spacious lawns for weddings, celebrations and gatherings, set against the Western Ghats.",
     highlights: ["Spacious lawns for celebrations", "Lawns and indoor venues for up to 800 guests"],
-    images: ["/tb/areas/celebrations.webp"],
+    images: ["/real/lawns-machan.webp", "/real/lawns-tent.webp", "/real/lawns-poolside.webp"],
+    outsidePhotos: [real("lawns-machan", "Machan lawn"), real("lawns-tent", "Tent lawn"), real("lawns-poolside", "Poolside lawn")],
     position: [28, 0, 20],
     camera: { pos: [44, 18, 44], target: [28, 0, 20] },
     moreUrl: "https://touchwoodblissweddings.com",
@@ -197,11 +202,23 @@ export const LOCATIONS: Location[] = [
     tagline: "Play, games and evenings by the bonfire",
     description: "Green spaces for families, with a kids play area, indoor and outdoor games and bonfire evenings.",
     highlights: ["Kids play area & family zones", "Indoor & outdoor games", "Bonfire & evening experiences", "Pet-friendly stays"],
-    images: ["/tb/areas/kids.webp", "/tb/areas/outdoor.webp"],
+    images: ["/real/gardens-play.webp", "/real/gardens-pathway.webp", "/real/gardens-machan.webp"],
+    outsidePhotos: [real("gardens-play", "Kids play area"), real("gardens-pathway", "Garden pathway"), real("gardens-machan", "Machan")],
     position: [-36, 0, 28],
     camera: { pos: [-22, 13, 46], target: [-36, 0, 28] },
     moreUrl: "https://touchwoodbliss.com/",
   },
+];
+
+/** Whole-resort real photo set, including the official drone shot. */
+export const RESORT_PHOTOS: RealPhoto[] = [
+  real("resort-aerial", "Aerial view of the resort"),
+  real("amora-exterior-pool", "Amora Villa"),
+  real("courtyard-courtyard", "Courtyard Villa"),
+  real("pool-2", "Swimming pool"),
+  real("roots-1", "Roots Cafe"),
+  real("lawns-machan", "Machan lawn"),
+  real("gardens-pathway", "Garden pathway"),
 ];
 
 export const getLocation = (id: string | null) => LOCATIONS.find((l) => l.id === id) ?? null;

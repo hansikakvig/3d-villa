@@ -6,7 +6,7 @@ import { getLocation } from "./data";
 import { useTour } from "./store";
 
 export default function LocationInformation() {
-  const { mode, selected, enterVilla, backToAerial, openEnquiry } = useTour();
+  const { mode, selected, enterVilla, backToAerial, openEnquiry, openPhotos } = useTour();
   const loc = getLocation(selected);
   const [img, setImg] = useState(0);
   useEffect(() => setImg(0), [selected]);
@@ -46,7 +46,16 @@ export default function LocationInformation() {
             </li>
           ))}
         </ul>
-        <div className="mt-6 flex flex-wrap gap-2">
+        {(loc.outsidePhotos.length > 0 || loc.insidePhotos?.length) && (
+          <button
+            onClick={() => openPhotos(loc.id, loc.outsidePhotos.length ? "outside" : "inside")}
+            className="tb-btn-ghost mt-6 w-full justify-center"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 15l5-5 5 5 3-3 5 5" /></svg>
+            View real photos in 3D
+          </button>
+        )}
+        <div className="mt-2 flex flex-wrap gap-2">
           {loc.kind === "villa" ? (
             <button onClick={() => enterVilla(loc.id)} className="tb-btn-primary flex-1">Explore Villa</button>
           ) : (

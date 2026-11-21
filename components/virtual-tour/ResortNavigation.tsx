@@ -5,7 +5,7 @@ import { LOCATIONS } from "./data";
 import { useTour } from "./store";
 
 export default function ResortNavigation() {
-  const { mode, selected, select, backToAerial, openEnquiry } = useTour();
+  const { mode, selected, select, backToAerial, openEnquiry, openPhotos } = useTour();
   const hidden = mode === "loading" || mode === "interior";
   if (hidden) return null;
   const explore = mode !== "intro";
@@ -21,6 +21,12 @@ export default function ResortNavigation() {
             <button onClick={backToAerial} className="tb-btn-ghost">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 010 18" /></svg>
               <span className="hidden sm:inline">Aerial view</span>
+            </button>
+          )}
+          {explore && (
+            <button onClick={() => openPhotos("resort", "outside")} className="tb-btn-ghost" aria-label="Real photos">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 15l5-5 5 5 3-3 5 5" /></svg>
+              <span className="hidden sm:inline">Real photos</span>
             </button>
           )}
           <button onClick={() => openEnquiry(selected)} className="tb-btn-primary">Enquire Now</button>
