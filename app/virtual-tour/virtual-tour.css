@@ -1,0 +1,51 @@
+.tb-root { font-family: var(--font-tb-sans), system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+.tb-serif { font-family: var(--font-tb-serif), Georgia, serif; font-weight: 500; letter-spacing: -0.01em; }
+
+.tb-glass {
+  background: linear-gradient(160deg, rgba(28, 44, 34, 0.62), rgba(16, 26, 20, 0.72));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+
+.tb-btn-primary, .tb-btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  border-radius: 999px; padding: 0.7rem 1.25rem;
+  font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500;
+  transition: background-color .3s, color .3s, border-color .3s, transform .3s;
+  cursor: pointer; white-space: nowrap;
+}
+.tb-btn-primary { background: #f3d9a4; color: #17241b; }
+.tb-btn-primary:hover { background: #fff3d6; transform: translateY(-1px); }
+.tb-btn-primary:disabled { opacity: .6; cursor: default; transform: none; }
+.tb-btn-ghost { border: 1px solid rgba(255,255,255,.3); color: #fff; background: rgba(16,26,20,.35); backdrop-filter: blur(10px); }
+.tb-btn-ghost:hover { border-color: #f3d9a4; color: #f3d9a4; }
+
+.tb-chip {
+  flex-shrink: 0; border-radius: 999px; padding: 0.5rem 0.95rem;
+  font-size: 0.7rem; letter-spacing: 0.08em; color: rgba(255,255,255,.82);
+  border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04);
+  transition: all .25s; cursor: pointer; white-space: nowrap;
+}
+.tb-chip:hover { border-color: rgba(243,217,164,.6); color: #fff; }
+.tb-chip-active { background: #f3d9a4; color: #17241b; border-color: #f3d9a4; }
+
+.tb-scroll { scrollbar-width: none; }
+.tb-scroll::-webkit-scrollbar { display: none; }
+
+.tb-root button:focus-visible, .tb-root a:focus-visible { outline: 2px solid #f3d9a4; outline-offset: 2px; }
+
+@keyframes tb-pulse { 0% { transform: scale(.6); opacity: .9 } 100% { transform: scale(2.2); opacity: 0 } }
+.tb-pulse { animation: tb-pulse 2s ease-out infinite; }
+@keyframes tb-fade { from { opacity: 0 } to { opacity: 1 } }
+.tb-fade-in { animation: tb-fade 1.2s ease both; }
+@keyframes tb-panel { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }
+.tb-panel-in { animation: tb-panel .6s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes tb-enter { 0%, 55% { opacity: 0 } 100% { opacity: 1 } }
+.tb-enter-fade { animation: tb-enter 1.8s ease-in both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tb-pulse, .tb-fade-in, .tb-panel-in, .tb-enter-fade { animation: none !important; }
+  .tb-enter-fade { opacity: 1; }
+}
