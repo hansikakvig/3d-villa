@@ -65,3 +65,60 @@ Code: `components/virtual-tour/`. `data.ts` is the single source of content, con
 - **360° photos**: drop equirectangular JPG/WebP files (2:1, about 6000×3000) in `public/tb/pano/` and set `pano: "/tb/pano/amora-living.jpg"` on the room in `data.ts`. The "placeholder" label disappears automatically.
 - **Real villa models**: export GLB from Blender (Draco + KTX2 via `gltf-transform optimize`), then replace the matching function in `ResortMasterplan.tsx` with `useGLTF`.
 - **Masterplan**: update `position` / `camera` values in `data.ts` from the surveyed site plan.
+
+---
+
+## 3D development toolkit
+
+Versions are unchanged: Next 15.5.29, React 19.1.0, three 0.170.0. There is a single copy of each of three, react and sharp.
+
+| Package | Version | Where |
+|---|---|---|
+| three, @react-three/fiber, @react-three/drei, gsap, zustand | already installed | dependencies |
+| @react-three/postprocessing / postprocessing | 3.2.2 / 6.39.6 | dependencies |
+| leva | 0.10.1 | dependencies (panel hidden in production unless `?debug`) |
+| pannellum | 2.5.7 | dependencies (client-only, lazy-loaded) |
+| sharp | 0.35.5 | dependencies (same copy Next.js uses) |
+| @gltf-transform/cli | 4.5.1 | devDependencies |
+| playwright | 1.65.1 | devDependencies |
+
+### Folders
+```
+assets/models-src/      ← put Blender GLB exports here (not served)
+assets/images-src/      ← original photos
+assets/panoramas-src/   ← original 360° equirectangular photos (2:1)
+public/models/          ← optimized output: name.glb + name-low.glb
+public/pano/            ← optimized panoramas: name.jpg + name-mobile.jpg
+public/media/           ← responsive webp/avif images
+public/decoders/        ← self-hosted Draco + Basis(KTX2) decoders (auto-copied)
+lib/three/              ← config, useResortGLTF (Draco/Meshopt/KTX2), quality tiers
+components/three-kit/   ← ProgressiveModel, PerformanceGuard, Effects, DevPanel, LazyCanvas, PannellumViewer
+app/toolkit-check/      ← hidden test page that exercises every tool (/toolkit-check)
+```
+
+### Commands
+| Command | What it does |
+|---|---|
+| `npm run models:optimize` | Optimizes every model in `assets/models-src`. Produces Meshopt + WebP output, plus a `-low.glb` LOD |
+| `npm run models:optimize:draco` | Same, using Draco |
+| `npm run models:optimize:ktx2` | Same, using KTX2 textures. **Needs KTX-Software (`toktx`) installed** |
+| `npm run models:inspect -- public/models/x.glb` | Prints the model's size, draw calls and extensions |
+| `npm run images:optimize` | Creates responsive photos and 360° panoramas (desktop and mobile) |
+| `npm run decoders:copy` | Re-copies the decoders (also runs automatically after `npm install`) |
+| `npm run assets:test` | Regenerates the test model and test panorama |
+| `npm run playwright:install` | Downloads Chromium for Playwright (run once per machine) |
+| `npm run test:smoke` | Loads the routes on desktop and mobile, fails on errors, saves screenshots to `test-results/` |
+
+### Using it in code
+```tsx
+import { ProgressiveModel, PerformanceGuard, Effects, DevPanel, useQuality } from "@/components/three-kit";
+const PannellumViewer = dynamic(() => import("@/components/three-kit/PannellumViewer"), { ssr: false });
+
+const q = useQuality();                       // low | medium | high (force with ?quality=low)
+<Canvas dpr={q.dpr} shadows={q.shadows}>
+  <ProgressiveModel url="/models/amora.glb" /> {/* placeholder → amora-low.glb → amora.glb */}
+  <PerformanceGuard />
+  <Effects tier={q.tier} />
+</Canvas>
+<DevPanel />
+```
