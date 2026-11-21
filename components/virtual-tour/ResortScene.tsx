@@ -73,12 +73,11 @@ function Hotspots() {
 
 export default function ResortScene({ onReady }: { onReady: () => void }) {
   const mode = useTour((s) => s.mode);
-  const photoTour = useTour((s) => s.photoTour);
   return (
     <Canvas
       shadows
       dpr={[1, 1.75]}
-      frameloop={mode === "interior" || photoTour ? "never" : "always"}
+      frameloop={mode === "interior" ? "never" : "always"}
       camera={{ fov: 42, near: 0.5, far: 5000, position: [150, 120, 210] }}
       gl={{ antialias: true, powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.95 }}
       onCreated={() => requestAnimationFrame(() => onReady())}

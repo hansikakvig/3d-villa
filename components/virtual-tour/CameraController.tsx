@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useThree } from "@react-three/fiber";
+import { useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import gsap from "gsap";
 import type { OrbitControls as OrbitImpl } from "three-stdlib";
@@ -35,9 +35,14 @@ export default function CameraController() {
       const vp = loc.viewpoints[viewpoint] ?? loc.viewpoints[0];
       shot = { pos: add(loc.position, vp.pos), target: add(loc.position, vp.target) };
       dur = 2;
-    } else if (mode === "entering" && loc?.entry) {
-      shot = { pos: add(loc.position, loc.entry.pos), target: add(loc.position, loc.entry.target) };
-      dur = 1.8;
+    } else if (mode === "entering" && loc) {
+      if (loc.entry) {
+        shot = { pos: add(loc.position, loc.entry.pos), target: add(loc.position, loc.entry.target) };
+      } else {
+        const [px, py, pz] = loc.camera.pos, [tx, ty, tz] = loc.camera.target;
+        shot = { pos: [tx + (px - tx) * 0.18, ty + (py - ty) * 0.18 + 1, tz + (pz - tz) * 0.18], target: loc.camera.target };
+      }
+      dur = 1.6;
       onComplete = () => setMode("interior");
     }
     if (mode === "interior") return;
@@ -57,14 +62,22 @@ export default function CameraController() {
       .to(c.target, { x: shot.target[0], y: shot.target[1], z: shot.target[2], duration: dur, ease: "power3.inOut" }, 0);
   }, [mode, selected, viewpoint, camera, reducedMotion, setMode]);
 
-  const close = mode === "villa" || mode === "entering";
+  // zooming in close on a selected place steps inside its real photographs
+  const enterInterior = useTour((s) => s.enterInterior);
+  useFrame(() => {
+    const c = controls.current;
+    if (!c || !c.enabled || mode !== "location" || !selected) return;
+    if (camera.position.distanceTo(c.target) < 11) enterInterior();
+  });
+
+  const close = mode === "villa" || mode === "entering" || mode === "location";
   return (
     <OrbitControls
       ref={controls}
       makeDefault
       enableDamping
       dampingFactor={0.08}
-      minDistance={close ? 3 : 10}
+      minDistance={close ? 6 : 10}
       maxDistance={420}
       maxPolarAngle={close ? Math.PI / 2 - 0.015 : Math.PI / 2.15}
       autoRotate={(mode === "intro" || mode === "loading") && !reducedMotion}

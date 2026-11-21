@@ -49,3 +49,16 @@
   .tb-pulse, .tb-fade-in, .tb-panel-in, .tb-enter-fade { animation: none !important; }
   .tb-enter-fade { opacity: 1; }
 }
+
+/* zoom walk-through transitions */
+@keyframes tb-walk-in { from { opacity: 0 } to { opacity: 1 } }
+.tb-walk-in { animation: tb-walk-in .7s ease both; }
+@keyframes tb-walk-out-fwd { from { opacity: 1; transform: scale(2.4) } to { opacity: 0; transform: scale(4) } }
+.tb-walk-out-fwd { animation: tb-walk-out-fwd .75s cubic-bezier(.4,0,.2,1) both; }
+@keyframes tb-walk-out-back { from { opacity: 1; transform: scale(1) } to { opacity: 0; transform: scale(.85) } }
+.tb-walk-out-back { animation: tb-walk-out-back .75s cubic-bezier(.4,0,.2,1) both; }
+@keyframes tb-enter-zoom { 0%, 50% { opacity: 0 } 100% { opacity: 1 } }
+.tb-enter-zoom { animation: tb-enter-zoom 1.6s ease-in both; }
+@media (prefers-reduced-motion: reduce) {
+  .tb-walk-in, .tb-walk-out-fwd, .tb-walk-out-back, .tb-enter-zoom { animation: none !important; }
+}

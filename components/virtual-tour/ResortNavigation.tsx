@@ -5,7 +5,7 @@ import { LOCATIONS } from "./data";
 import { useTour } from "./store";
 
 export default function ResortNavigation() {
-  const { mode, selected, select, backToAerial, openEnquiry, openPhotos } = useTour();
+  const { mode, selected, select, backToAerial, openEnquiry } = useTour();
   const hidden = mode === "loading" || mode === "interior";
   if (hidden) return null;
   const explore = mode !== "intro";
@@ -23,12 +23,6 @@ export default function ResortNavigation() {
               <span className="hidden sm:inline">Aerial view</span>
             </button>
           )}
-          {explore && (
-            <button onClick={() => openPhotos("resort", "outside")} className="tb-btn-ghost" aria-label="Real photos">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 15l5-5 5 5 3-3 5 5" /></svg>
-              <span className="hidden sm:inline">Real photos</span>
-            </button>
-          )}
           <button onClick={() => openEnquiry(selected)} className="tb-btn-primary">Enquire Now</button>
         </div>
       </header>
@@ -44,7 +38,7 @@ export default function ResortNavigation() {
             ))}
           </div>
           <p className="mt-2 text-center text-[10px] tracking-wide text-white/70 drop-shadow">
-            Illustrative 3D masterplan: approximate placement and placeholder architecture, not to scale.<span className="hidden sm:inline"> Drag to rotate · scroll or pinch to zoom · right-drag to pan.</span>
+            Illustrative 3D masterplan, not to scale. Select a place and zoom in to step into real photographs.<span className="hidden sm:inline"> Drag to rotate · scroll or pinch to zoom · right-drag to pan.</span>
           </p>
         </nav>
       )}
